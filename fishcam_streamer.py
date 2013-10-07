@@ -6,7 +6,7 @@ from tornado.options import define, options
 import subprocess
 import shlex
 
-define("port", default=8888, help="run on the given port", type=int)
+define("port", default=9090, help="run on the given port", type=int)
 
 # TODO: These are hardcoded right now, but they need to be computed
 # dynamically.  Sessions need to be defined for logged in users, and
@@ -14,7 +14,7 @@ define("port", default=8888, help="run on the given port", type=int)
 # design still
 rtp_server = "192.168.1.113"
 rtp_port = 4000
-stream_server_url = "http://localhost:8888"
+stream_server_url = "http://eddy.knowsitall.info:9090"
 
 mp4_mux_command = "gst-launch -q "                                          \
     "tcpclientsrc host={server} port={port} protocol=1 ! "                  \
