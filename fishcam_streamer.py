@@ -51,7 +51,7 @@ class VideoStreamHandler(tornado.web.RequestHandler):
 
         self.muxer_process = subprocess.Popen(shlex.split(formatted_command),
                                               stderr=subprocess.PIPE,
-                                              bufsize=-1)
+                                              bufsize=-1, close_fds=True)
 
         stream_fd = self.muxer_process.stderr.fileno()
 
