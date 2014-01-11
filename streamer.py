@@ -13,27 +13,21 @@ define("port", default=constants.default_port, help="run on the given port",
 
 class FishcamHandler(tornado.web.RequestHandler):
     def get(self):
-        self.write("""
-        <!DOCTYPE html> <html> <body>
-
-        <video controls autoplay>
-        <source src="{url}/stream.mp4" autoplay type="video/mp4">
-        </video>
-
-        </body> </html>
-        """.format(url=constants.stream_server_url))
+        self.write(constants.video_page.format(url=constants.stream_server_url))
 
 class VideoStreamHandler(tornado.web.RequestHandler):
     _chunk_size = 4096
 
-    def initialize(self, mux_command, rtp_server, rtp_port):
+    def initialize(self, mux_command, rtp_server, rtp_port, video_format):
+        self.video_format = video_format
         self.rtp_server = rtp_server
         self.rtp_port = rtp_port
         self.mux_command = mux_command.format(server=rtp_server, port=rtp_port)
 
     @tornado.web.asynchronous
     def get(self):
-        self.set_header("Content-Type", "video/mp4")
+        self.set_header("Content-Type", "video/{video_format}".format(
+                                              video_format=self.video_format))
 
         self.muxer_process = subprocess.Popen(shlex.split(self.mux_command),
                                               stderr=subprocess.PIPE,
@@ -44,6 +38,7 @@ class VideoStreamHandler(tornado.web.RequestHandler):
         self.stream = tornado.iostream.PipeIOStream(stream_fd)
         self.stream.read_bytes(VideoStreamHandler._chunk_size,
                                self.video_chunk)
+        self.flush()
 
     def video_chunk(self, data):
         self.write(data)
@@ -64,7 +59,8 @@ application = tornado.web.Application([
     (r"/stream.mp4", VideoStreamHandler, dict(
                               mux_command=constants.mp4_mux_command,
                               rtp_server=constants.rtp_server,
-                              rtp_port=constants.rtp_port)
+                              rtp_port=constants.rtp_port,
+                              video_format="mp4")
     ),
 ])
 

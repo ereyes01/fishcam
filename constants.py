@@ -31,5 +31,15 @@ webm_mux_command = "gst-launch -q "                                         \
         "webmmux streamable=true ! queue ! "                                \
         "filesink  location=/dev/stderr"
 
+video_page = """
+<!DOCTYPE html> <html> <body>
+
+<video controls autoplay>
+<source src="{url}/stream.mp4" autoplay type="video/mp4">
+</video>
+
+</body> </html>
+"""
+
 if __name__ == "__main__":
     pass
