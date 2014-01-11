@@ -12,7 +12,7 @@ define("port", default=9090, help="run on the given port", type=int)
 # dynamically.  Sessions need to be defined for logged in users, and
 # their camera must be located... this aspect needs a little more 
 # design still
-rtp_server = "192.168.1.113"
+rtp_server = "192.168.1.143"
 rtp_port = 4000
 stream_server_url = "http://eddy.knowsitall.info:9090"
 
