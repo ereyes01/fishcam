@@ -16,7 +16,7 @@ class FishcamHandler(tornado.web.RequestHandler):
         self.write(constants.video_page.format(url=constants.stream_server_url))
 
 class VideoStreamHandler(tornado.web.RequestHandler):
-    _chunk_size = 4096
+    _chunk_size = 65536
 
     def initialize(self, mux_command, rtp_server, rtp_port, video_format):
         self.video_format = video_format
@@ -61,6 +61,12 @@ application = tornado.web.Application([
                               rtp_server=constants.rtp_server,
                               rtp_port=constants.rtp_port,
                               video_format="mp4")
+    ),
+    (r"/stream.webm", VideoStreamHandler, dict(
+                              mux_command=constants.webm_mux_command,
+                              rtp_server=constants.rtp_server,
+                              rtp_port=constants.rtp_port,
+                              video_format="webm")
     ),
 ])
 
