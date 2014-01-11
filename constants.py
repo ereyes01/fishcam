@@ -16,7 +16,7 @@ mp4_mux_command = "gst-launch -q "                                          \
         "encoding-name=(string)H264' ! "                                    \
     "rtph264depay ! queue ! "                                               \
     "h264parse ! queue ! "                                                  \
-    "mp4mux streamable=true fragment-duration=5 presentation-time=true ! "  \
+    "mp4mux streamable=true fragment-duration=5 ! "                         \
         "queue ! "                                                          \
     "filesink location=/dev/stderr"
 
