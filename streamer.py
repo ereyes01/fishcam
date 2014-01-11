@@ -26,6 +26,17 @@ mp4_mux_command = "gst-launch -q "                                          \
         "queue ! "                                                          \
     "filesink location=/dev/stderr"
 
+webm_mux_command = "gst-launch -q "                                         \
+    "tcpclientsrc host={server} port={port} protocol=1 ! "                  \
+    "'application/x-rtp, media=(string)video, clock-rate=(int)90000, "      \
+        "encoding-name=(string)H264' ! "                                    \
+        "rtph264depay ! queue ! "                                           \
+        "ffdec_h264 ! queue ! "                                             \
+        "ffmpegcolorspace ! queue ! "                                       \
+        "vp8enc ! queue ! "                                                 \
+        "webmmux streamable=true ! queue ! "                                \
+        "filesink  location=/dev/stderr"
+
 class FishcamHandler(tornado.web.RequestHandler):
     def get(self):
         self.write("""
@@ -41,15 +52,16 @@ class FishcamHandler(tornado.web.RequestHandler):
 class VideoStreamHandler(tornado.web.RequestHandler):
     _chunk_size = 4096
 
+    def initialize(self, mux_command, rtp_server, rtp_port):
+        self.rtp_server = rtp_server
+        self.rtp_port = rtp_port
+        self.mux_command = mux_command.format(server=rtp_server, port=rtp_port)
+
     @tornado.web.asynchronous
     def get(self):
         self.set_header("Content-Type", "video/mp4")
 
-        formatted_command = mp4_mux_command.format(
-                                server  = rtp_server, 
-                                port    = rtp_port)
-
-        self.muxer_process = subprocess.Popen(shlex.split(formatted_command),
+        self.muxer_process = subprocess.Popen(shlex.split(self.mux_command),
                                               stderr=subprocess.PIPE,
                                               bufsize=-1, close_fds=True)
 
@@ -75,7 +87,10 @@ class VideoStreamHandler(tornado.web.RequestHandler):
 
 application = tornado.web.Application([
     (r"/fishcam.html", FishcamHandler),
-    (r"/stream.mp4", VideoStreamHandler),
+    (r"/stream.mp4", VideoStreamHandler, dict(mux_command=mp4_mux_command,
+                                              rtp_server=rtp_server,
+                                              rtp_port=rtp_port)
+    ),
 ])
 
 if __name__ == "__main__":
