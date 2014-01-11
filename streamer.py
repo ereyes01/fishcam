@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 import tornado.ioloop
 import tornado.web
@@ -6,36 +6,10 @@ from tornado.options import define, options
 import subprocess
 import shlex
 
-define("port", default=9090, help="run on the given port", type=int)
+import constants
 
-# TODO: These are hardcoded right now, but they need to be computed
-# dynamically.  Sessions need to be defined for logged in users, and
-# their camera must be located... this aspect needs a little more 
-# design still
-rtp_server = "192.168.1.143"
-rtp_port = 4000
-stream_server_url = "http://eddy.knowsitall.info:9090"
-
-mp4_mux_command = "gst-launch -q "                                          \
-    "tcpclientsrc host={server} port={port} protocol=1 ! "                  \
-    "'application/x-rtp, media=(string)video, clock-rate=(int)90000, "      \
-        "encoding-name=(string)H264' ! "                                    \
-    "rtph264depay ! queue ! "                                               \
-    "h264parse ! queue ! "                                                  \
-    "mp4mux streamable=true fragment-duration=5 presentation-time=true ! "  \
-        "queue ! "                                                          \
-    "filesink location=/dev/stderr"
-
-webm_mux_command = "gst-launch -q "                                         \
-    "tcpclientsrc host={server} port={port} protocol=1 ! "                  \
-    "'application/x-rtp, media=(string)video, clock-rate=(int)90000, "      \
-        "encoding-name=(string)H264' ! "                                    \
-        "rtph264depay ! queue ! "                                           \
-        "ffdec_h264 ! queue ! "                                             \
-        "ffmpegcolorspace ! queue ! "                                       \
-        "vp8enc ! queue ! "                                                 \
-        "webmmux streamable=true ! queue ! "                                \
-        "filesink  location=/dev/stderr"
+define("port", default=constants.default_port, help="run on the given port",
+       type=int)
 
 class FishcamHandler(tornado.web.RequestHandler):
     def get(self):
@@ -47,7 +21,7 @@ class FishcamHandler(tornado.web.RequestHandler):
         </video>
 
         </body> </html>
-        """.format(url=stream_server_url))
+        """.format(url=constants.stream_server_url))
 
 class VideoStreamHandler(tornado.web.RequestHandler):
     _chunk_size = 4096
@@ -87,9 +61,10 @@ class VideoStreamHandler(tornado.web.RequestHandler):
 
 application = tornado.web.Application([
     (r"/fishcam.html", FishcamHandler),
-    (r"/stream.mp4", VideoStreamHandler, dict(mux_command=mp4_mux_command,
-                                              rtp_server=rtp_server,
-                                              rtp_port=rtp_port)
+    (r"/stream.mp4", VideoStreamHandler, dict(
+                              mux_command=constants.mp4_mux_command,
+                              rtp_server=constants.rtp_server,
+                              rtp_port=constants.rtp_port)
     ),
 ])
 
