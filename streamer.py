@@ -53,6 +53,7 @@ class VideoStreamHandler(tornado.web.RequestHandler):
     def on_connection_close(self):
         self.stream.close()
         self.cleanup_muxer()
+        self.finish()
 
 application = tornado.web.Application([
     (r"/fishcam.html", FishcamHandler),
