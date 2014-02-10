@@ -20,6 +20,8 @@ mp4_mux_command = "gst-launch -q "                                          \
         "queue ! "                                                          \
     "filesink location=/dev/stderr"
 
+# This causes the server to transcode to VP8. It's super slow on 1 CPU!
+# Is there any way to parallelize this?
 webm_mux_command = "gst-launch -q "                                         \
     "tcpclientsrc host={server} port={port} protocol=1 ! "                  \
     "'application/x-rtp, media=(string)video, clock-rate=(int)90000, "      \
@@ -31,6 +33,9 @@ webm_mux_command = "gst-launch -q "                                         \
         "webmmux streamable=true ! queue ! "                                \
         "filesink  location=/dev/stderr"
 
+# Right now only serving embedded H.264 video. Doesn't work on Firefox.
+# WebM/VP8 works, but is too slow server-side.  Directly linking to the
+# stream URL works on Firefox.
 video_page = """
 <!DOCTYPE html> <html> <body>
 
