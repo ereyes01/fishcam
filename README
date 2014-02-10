@@ -1,0 +1,18 @@
+This application requires Python Tornado and GStreamer. It serves 
+live video feed into my home aquarium.
+
+The video itself comes from a Raspberry Pi with an attached webcam. The
+video feed is already encoded in H.264 and arrives via an RTP/TCP 
+stream created by GStreamer on the Raspberry Pi.
+
+The code running on the Raspberry Pi still needs to be cleaned up and
+will be added here soon.  Also, the Pi's IP address and port numbers
+are currently hard-coded in constants.py.  This could be improved upon
+by a negotation scheme where the Pi can connect its video stream as a
+client. We'll see when I get time to do that...
+
+You can execute this server by running:
+
+python streamer.py
+
+... logs will appear on stdout.
