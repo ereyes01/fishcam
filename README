@@ -1,18 +1,43 @@
-This application requires Python Tornado and GStreamer. It serves 
-live video feed into my home aquarium.
+The server application requires Python Tornado and GStreamer. It serves
+a live video feed into my home aquarium.
 
 The video itself comes from a Raspberry Pi with an attached webcam. The
 video feed is already encoded in H.264 and arrives via an RTP/TCP 
 stream created by GStreamer on the Raspberry Pi.
 
-The code running on the Raspberry Pi still needs to be cleaned up and
-will be added here soon.  Also, the Pi's IP address and port numbers
-are currently hard-coded in constants.py.  This could be improved upon
-by a negotation scheme where the Pi can connect its video stream as a
-client. We'll see when I get time to do that...
+The Raspberry Pi's IP address and port numbers are currently hard-coded 
+in constants.py.  This could be improved upon by a negotation scheme 
+where the Pi can connect its video stream as a client. We'll see when I
+get time to do that...
 
 You can execute this server by running:
 
 python streamer.py
 
 ... logs will appear on stdout.
+
+The raspberry-pi subdirectory contains the code that runs on the
+Raspberry Pi. It isn't much as you can see. The main files are:
+
+- capture.c:
+Reads H.264 bits from the Logitech c920. This code is a slightly 
+tweaked version of the one from https://github.com/csete/bonecam
+
+- video-server
+This script initializes the camera and creates a video stream out of
+the video feed collected by the capture program.
+
+There are several dependencies that this code needs. They are not
+listed here, but I will make this easier with some packaging in a
+future commit.  The main dependencies are gstreamer with base/good/bad
+plugins, and v4l2 on the Raspberry Pi side.
+
+The capture.c program must be built with an ARM C compiler. Since it is
+so small of a program, the simplest way to build it would be on the 
+Raspberry Pi itself.  If you run Raspbian, installing gcc is simple:
+
+sudo apt-get install gcc
+
+... then to compile a binary for capture.c:
+
+gcc -O2 -Wall `pkg-config --cflags --libs libv4l2` capture.c -o capture
