@@ -51,6 +51,7 @@ static int out_buf;
 static int force_format;
 static int frame_count = 200;
 static int frame_number = 0;
+static int infinite_loop = 1;
 
 static void errno_exit(const char *s)
 {
@@ -189,7 +190,7 @@ static void mainloop(void)
 
 	count = frame_count;
 
-	while (count-- > 0) {
+	while (infinite_loop || count-- > 0) {
 		for (;; ) {
 			fd_set fds;
 			struct timeval tv;
@@ -651,6 +652,7 @@ int main(int argc, char **argv)
 			break;
 
 		case 'c':
+            infinite_loop = 0;
 			errno = 0;
 			frame_count = strtol(optarg, NULL, 0);
 			if (errno)
