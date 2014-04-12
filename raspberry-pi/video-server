@@ -19,5 +19,5 @@ v4l2-ctl --set-parm=30
 
 echo "Starting streaming server to $1:$2"
 
-../capture/capture -o | gst-launch -v -e filesrc location=/dev/fd/0 ! legacyh264parse ! queue ! rtph264pay pt=96 config-interval=1 ! queue ! tcpserversink host=$1 port=$2 protocol=1
+./capture -o | gst-launch -v -e filesrc location=/dev/fd/0 ! legacyh264parse ! queue ! rtph264pay pt=96 config-interval=1 ! queue ! tcpserversink host=$1 port=$2 protocol=1
 
