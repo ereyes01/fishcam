@@ -11,6 +11,12 @@ in constants.py.  This could be improved upon by a negotation scheme
 where the Pi can connect its video stream as a client. We'll see when I
 get time to do that...
 
+To obtain the code, run the following command:
+
+```
+$ git clone https://github.com/ereyes01/fishcam.git
+```
+
 ## HTTP Stream Server
 
 Make sure you have the following dependencies installed:
