@@ -40,6 +40,12 @@ $ python streamer.py --camera_ip=192.168.0.5
 Replace the IP above with your Raspberry Pi's IP address. The service's logs 
 will appear on stdout.
 
+You can also read about all the available options by printing the help message:
+
+```
+$ python streamer.py --help
+```
+
 ## Raspberry Pi
 
 The raspberry-pi subdirectory contains the code that runs on the
@@ -63,8 +69,10 @@ running Raspbian):
 Copy the code onto your Raspberry Pi:
 
 ```
-$ tar -cf - ./raspberry-pi | ssh pi@<pi-ip-address> "tar -xvf - && mv raspberry-pi webcam"
+$ tar -cf - ./raspberry-pi | ssh pi@192.168.0.5 "tar -xvf - && mv raspberry-pi webcam"
 ```
+
+Replace the IP above with your Raspberry Pi's IP address.
 
 V4l / Gstreamer Dependencies:
 
@@ -97,7 +105,7 @@ $ cd ~/webcam
 ```
 
 ```
-$ ./video-server <IP address> 4000
+$ ./video-server 0.0.0.0 4000
 ```
 
 That will start a server that the web service can connect to. The LED on the 
