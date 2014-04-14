@@ -2,10 +2,11 @@
 
 default_port = 9090
 
-# TODO: These are hardcoded right now, but they need to be computed
-# dynamically.  Sessions need to be defined for logged in users, and
-# their camera must be located... this aspect needs a little more 
-# design still
+# TODO: The camera device should connect as a client, which should 
+# obviate the need to hardcode IP addresses here. This app should run a
+# gstreamer server that can service multiple HTTP clients. Not sure if 
+# it makes sense to support >1 camera device per instance of this
+# application, might be interesting if the need arises.
 rtp_server = "192.168.1.143"
 rtp_port = 4000
 stream_server_url = "http://eddy.knowsitall.info:9090"
@@ -33,9 +34,8 @@ webm_mux_command = "gst-launch -q "                                         \
         "webmmux streamable=true ! queue ! "                                \
         "filesink  location=/dev/stderr"
 
-# Right now only serving embedded H.264 video. Doesn't work on Firefox.
-# WebM/VP8 works, but is too slow server-side.  Directly linking to the
-# stream URL works on Firefox.
+# Right now only serving embedded H.264 video. WebM/VP8 is too slow (see
+# comment above).
 video_page = """
 <!DOCTYPE html> <html> <body>
 
