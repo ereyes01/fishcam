@@ -2,14 +2,11 @@
 
 default_port = 9090
 
-# TODO: The camera device should connect as a client, which should 
-# obviate the need to hardcode IP addresses here. This app should run a
-# gstreamer server that can service multiple HTTP clients. Not sure if 
-# it makes sense to support >1 camera device per instance of this
-# application, might be interesting if the need arises.
-rtp_server = "192.168.1.143"
-rtp_port = 4000
-stream_server_url = "http://eddy.knowsitall.info:9090"
+# TODO: The camera device should connect as a client. This app should 
+# run a gstreamer server that can service multiple HTTP clients. Not 
+# sure if it makes sense to support >1 camera device per instance of
+# this application, might be interesting if the need arises.
+default_camera_port = 4000
 
 mp4_mux_command = "gst-launch -q "                                          \
     "tcpclientsrc host={server} port={port} protocol=1 ! "                  \

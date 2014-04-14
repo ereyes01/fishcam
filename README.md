@@ -6,10 +6,8 @@ The video itself comes from a Raspberry Pi with an attached webcam. The
 video feed is already encoded in H.264 and arrives via an RTP/TCP 
 stream created by GStreamer on the Raspberry Pi.
 
-The Raspberry Pi's IP address and port numbers are currently hard-coded 
-in constants.py.  This could be improved upon by a negotation scheme 
-where the Pi can connect its video stream as a client. We'll see when I
-get time to do that...
+Currently, the Raspberry Pi is the server of the stream. You must point the 
+web service at it via a command line argument.
 
 To obtain the code, run the following command:
 
@@ -31,18 +29,16 @@ $ pip install tornado
 
 For the Python stuff, it is strongly recommended that you use a [virtualenv](http://www.virtualenv.org/en/latest/).
 
-Before you run the server, make sure you change the IP address of the Raspberry
-Pi in the file constants.py. This is a little ghetto right now, but as I said,
-this still needs a future improvement in which the Raspberry Pi connects to the
-server as a client.
+Take note of your camera / Raspberry Pi's IP address.
 
 You can execute the server by running:
 
 ```
-$ python streamer.py
+$ python streamer.py --camera_ip=192.168.0.5
 ```
 
-... logs will appear on stdout.
+Replace the IP above with your Raspberry Pi's IP address. The service's logs 
+will appear on stdout.
 
 ## Raspberry Pi
 
@@ -115,3 +111,5 @@ http://localhost:9090/fishcam.html
 
 Hope these instructions help you get up and running!
 
+Please open an issue if you're having trouble, or if you've found that I broke 
+something.

@@ -3,26 +3,28 @@
 import tornado.ioloop
 import tornado.web
 from tornado.options import define, options
-import subprocess
-import shlex
+import shlex, subprocess, sys
 
 import constants
 
 define("port", default=constants.default_port, help="run on the given port",
        type=int)
+define("camera_ip", help="IP address of device serving camera stream", type=str)
+define("camera_port", default=constants.default_camera_port, 
+       help="Port of device serving camera stream", type=str)
 
 class FishcamHandler(tornado.web.RequestHandler):
     def get(self):
-        self.write(constants.video_page.format(url=constants.stream_server_url))
+        server_url = "{}://{}".format(self.request.protocol, self.request.host)
+        self.write(constants.video_page.format(url=server_url))
 
 class VideoStreamHandler(tornado.web.RequestHandler):
     _chunk_size = 65536
 
-    def initialize(self, mux_command, rtp_server, rtp_port, video_format):
+    def initialize(self, mux_command, video_format):
         self.video_format = video_format
-        self.rtp_server = rtp_server
-        self.rtp_port = rtp_port
-        self.mux_command = mux_command.format(server=rtp_server, port=rtp_port)
+        self.mux_command = mux_command.format(server=options.camera_ip,
+                                              port=options.camera_port)
 
     @tornado.web.asynchronous
     def get(self):
@@ -55,23 +57,26 @@ class VideoStreamHandler(tornado.web.RequestHandler):
         self.cleanup_muxer()
         self.finish()
 
+def parse_cli_options():
+    options.parse_command_line()
+    if options.camera_ip is None:
+        sys.stderr.write("ERROR: camera_ip is required\n\n")
+        options.print_help()
+        sys.exit(1)
+
 application = tornado.web.Application([
     (r"/fishcam.html", FishcamHandler),
     (r"/stream.mp4", VideoStreamHandler, dict(
                               mux_command=constants.mp4_mux_command,
-                              rtp_server=constants.rtp_server,
-                              rtp_port=constants.rtp_port,
                               video_format="mp4")
     ),
     (r"/stream.webm", VideoStreamHandler, dict(
                               mux_command=constants.webm_mux_command,
-                              rtp_server=constants.rtp_server,
-                              rtp_port=constants.rtp_port,
                               video_format="webm")
     ),
 ])
 
 if __name__ == "__main__":
-    tornado.options.parse_command_line()
+    parse_cli_options()
     application.listen(options.port)
     tornado.ioloop.IOLoop.instance().start()
