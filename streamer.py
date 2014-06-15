@@ -13,6 +13,10 @@ define("camera_ip", help="IP address of device serving camera stream", type=str)
 define("camera_port", default=constants.default_camera_port, 
        help="Port of device serving camera stream", type=str)
 
+class RootHandler(tornado.web.RequestHandler):
+    def get(self):
+        self.redirect(r'/fishcam.html')
+
 class FishcamHandler(tornado.web.RequestHandler):
     def get(self):
         server_url = "{}://{}".format(self.request.protocol, self.request.host)
@@ -65,6 +69,7 @@ def parse_cli_options():
         sys.exit(1)
 
 application = tornado.web.Application([
+    (r"/", RootHandler),
     (r"/fishcam.html", FishcamHandler),
     (r"/stream.mp4", VideoStreamHandler, dict(
                               mux_command=constants.mp4_mux_command,
